@@ -1,0 +1,27 @@
+{
+  "name": "orangehrm-sdet-ui-automation",
+  "version": "1.0.0",
+  "description": "SDET UI Automation Technical Test - OrangeHRM Employee Management duplicate handling (Playwright + TypeScript)",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "postinstall": "playwright install chromium"
+  },
+  "keywords": [
+    "playwright",
+    "typescript",
+    "sdet",
+    "orangehrm",
+    "ui-automation",
+    "page-object-model"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.7.0",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.6.0"
+  }
+}
