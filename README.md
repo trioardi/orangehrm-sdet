@@ -8,6 +8,29 @@ until exactly one remains — all through the UI.
 - Flow: Login → PIM → Add Employee (×5) → Employee List → search → select via
   checkbox → delete down to 1 → validate before & after.
 
+## AI Usage Disclaimer
+
+This solution was built with the assistance of **Claude (Anthropic AI)** as a
+pair-programming tool. This is intentional and transparent: in my current role,
+using AI in our daily engineering work is a normal, encouraged practice, and I
+wanted this submission to reflect how a modern QA/SDET team actually operates —
+pairing automation expertise with the latest AI tooling to move faster.
+
+Crucially, **AI output was never accepted blindly.** Every locator, wait
+strategy, and assertion was reviewed line by line and validated against the real
+OrangeHRM DOM and the technical-test rules to guard against hallucination or
+brittle code. Where the AI suggested something that violated the rules (hard
+waits, `nth-child`, Employee-ID-based selection) or introduced flakiness, it was
+rejected and replaced. I can explain and defend every engineering decision in
+this repository. A full breakdown of prompts, accepted output, corrected output,
+and rejected output is in [AI-NOTES.md](./AI-NOTES.md).
+
+## Screen Recording
+
+A screen recording walking through the implementation and a live run is included
+in the repository at
+[`docs/Explanation short - Satrio Ardi.mov`](./docs/Explanation%20short%20-%20Satrio%20Ardi.mov).
+
 ## Framework
 
 - **Playwright** with **TypeScript**

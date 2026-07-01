@@ -41,8 +41,13 @@ export class AddEmployeePage extends BasePage {
     await this.fillWhenReady(this.lastName, last);
     await this.clickWhenReady(this.saveButton);
 
-    // On success the app routes to .../pim/viewPersonalDetails/empNumber/<id>.
-    await this.page.waitForURL(/\/pim\/viewPersonalDetails\/empNumber\/\d+$/);
+    // Wait for the create API to accept the employee, then confirm the app
+    // navigates to the newly created employee's Personal Details page.
+    await this.page.waitForResponse(
+      (response) => response.url().includes('/api/v2/pim/employees') && response.request().method() === 'POST' && response.status() === 200,
+      { timeout: 30_000 },
+    );
+    await expect(this.page).toHaveURL(/\/pim\/viewPersonalDetails\/empNumber\/\d+$/);
     await this.waitForPageReady();
   }
 }

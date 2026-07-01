@@ -14,7 +14,8 @@ export class LoginPage extends BasePage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto('/web/index.php/auth/login');
+    await this.page.goto('/web/index.php/auth/login', { waitUntil: 'domcontentloaded' });
+    await this.page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined);
     await expect(this.username).toBeVisible();
   }
 
