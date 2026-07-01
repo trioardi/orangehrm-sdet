@@ -42,7 +42,7 @@ export class AddEmployeePage extends BasePage {
     await this.clickWhenReady(this.saveButton);
 
     // On success the app routes to .../pim/viewPersonalDetails/empNumber/<id>.
-    await this.page.waitForURL('**/viewPersonalDetails/empNumber/**');
+    await this.page.waitForURL(/\/pim\/viewPersonalDetails\/empNumber\/\d+$/);
     await this.waitForPageReady();
   }
 }
