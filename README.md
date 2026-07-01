@@ -98,7 +98,7 @@ waits handle timing.
 ## Handling Duplicate Names
 
 1. **Create** 5 employees with first name `Mardi` (Stage 1).
-2. **Search** the Employee List by name.
+2. **Search** the Employee List by the run-scoped **full name** (`Mardi Auto<runId>`).
 3. **Identify** the duplicate set by matching row text (first + last name),
    independent of ID or row order.
 4. **Select** every duplicate except one via the real UI checkboxes.
@@ -115,6 +115,14 @@ keeps one arbitrary record and removes the rest.
 > duplicates of each other; the surname only isolates this run's dataset so
 > assertions can't be polluted by data other users created. This trades a
 > literal single "Mardi" for a repeatable, non-destructive test.
+>
+> Crucially, **every search filters by the full name, not the bare `Mardi`**.
+> A first-name-only search on the public demo returns a large, paginated grid of
+> everyone else's leftover `Mardi` records; that grid re-renders after loading
+> and clears the checkbox selection mid-delete, which was a real source of
+> flakiness. Filtering by `Mardi Auto<runId>` keeps the grid to exactly this
+> run's five rows, so selection and deletion stay deterministic no matter how
+> polluted the shared instance is.
 
 ## Assertion
 
@@ -132,10 +140,18 @@ improved, and rejected.
 
 ## Additional Notes
 
-- **Assumption:** the search by first name returns the run's records on the
-  first page of results (the demo resets its data periodically, so accumulation
-  is unlikely). On a heavily-populated instance you would search by the
-  run-scoped surname instead to avoid pagination.
+- **Creation is retried and confirmed by navigation.** Each employee save is
+  confirmed by the app's redirect to the new employee's Personal Details page
+  (a definitive success signal), and the whole open → fill → save flow retries
+  up to 3× to absorb the demo's occasional slow/dropped saves — no hard waits.
+- **Known limitation — shared-demo interference.** Because the target is the
+  *public* demo, other people run this same "create/delete Mardi" task
+  concurrently, and their first-name-only bulk-deletes can remove our rows even
+  though our surname is unique. This is not preventable from the client. It is
+  the one residual, environment-driven flake; CI runs with `retries: 1`
+  (see [playwright.config.ts](./playwright.config.ts)), which re-runs the serial
+  group and absorbs it. For a guaranteed-deterministic run, point `BASE_URL` at
+  a private/Dockerized OrangeHRM instance.
 - The flow leaves exactly one `Mardi` record behind (the required end state);
   it does not clean that record up so the result stays verifiable.
 - Screenshots, video, and traces are captured automatically on failure

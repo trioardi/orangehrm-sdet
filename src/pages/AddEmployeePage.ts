@@ -30,8 +30,32 @@ export class AddEmployeePage extends BasePage {
   }
 
   /**
-   * Creates a single employee and waits for OrangeHRM to confirm success by
-   * redirecting to the freshly created employee's Personal Details page.
+   * Opens the form and creates a single employee, retrying the whole open ->
+   * fill -> save flow if the shared demo is momentarily slow or drops the save.
+   *
+   * The public demo occasionally responds slowly enough that a single save
+   * confirmation times out; retrying from a fresh form is a deterministic,
+   * self-contained way to absorb that transient instability without hard waits.
+   */
+  async createEmployee(first: string, last: string, middle = '', maxAttempts = 3): Promise<void> {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await this.open();
+        await this.addEmployee(first, last, middle);
+        return;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError;
+  }
+
+  /**
+   * Fills the form and saves, confirming success by the app's redirect to the
+   * freshly created employee's Personal Details page. The URL change only
+   * happens on a successful create, so it is a more reliable success signal
+   * than matching a specific API response status.
    */
   async addEmployee(first: string, last: string, middle = ''): Promise<void> {
     await this.fillWhenReady(this.firstName, first);
@@ -41,13 +65,7 @@ export class AddEmployeePage extends BasePage {
     await this.fillWhenReady(this.lastName, last);
     await this.clickWhenReady(this.saveButton);
 
-    // Wait for the create API to accept the employee, then confirm the app
-    // navigates to the newly created employee's Personal Details page.
-    await this.page.waitForResponse(
-      (response) => response.url().includes('/api/v2/pim/employees') && response.request().method() === 'POST' && response.status() === 200,
-      { timeout: 30_000 },
-    );
-    await expect(this.page).toHaveURL(/\/pim\/viewPersonalDetails\/empNumber\/\d+$/);
+    await this.page.waitForURL(/\/pim\/viewPersonalDetails\/empNumber\/\d+$/, { timeout: 30_000 });
     await this.waitForPageReady();
   }
 }

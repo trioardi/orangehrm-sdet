@@ -29,6 +29,12 @@ test.describe.serial('OrangeHRM Employee Management', () => {
   const runId = `${Date.now()}`.slice(-6);
   const firstName = DUPLICATE_FIRST_NAME;
   const lastName = buildRunScopedLastName(runId);
+  // Search always uses the run-scoped FULL name ("Mardi Auto481923"), never the bare
+  // first name. The public demo accumulates many "Mardi" records from other runs, so a
+  // first-name-only search returns a large, paginated, constantly re-rendering grid that
+  // clears the checkbox selection mid-delete. Filtering by the full name keeps the grid
+  // to exactly this run's 5 rows, which makes selection and deletion deterministic.
+  const fullName = `${firstName} ${lastName}`;
 
   let loginPage: LoginPage;
   let addEmployeePage: AddEmployeePage;
@@ -49,14 +55,13 @@ test.describe.serial('OrangeHRM Employee Management', () => {
     // Create five employees in sequence. Each employee shares the same required
     // first name so the later duplicate-handling step has something to process.
     for (let i = 0; i < EMPLOYEES_TO_CREATE; i++) {
-      await addEmployeePage.open();
-      await addEmployeePage.addEmployee(firstName, lastName);
+      await addEmployeePage.createEmployee(firstName, lastName);
     }
 
     // After creation, go to the employee list and confirm the exact duplicate set
     // exists in the UI. This is the main proof that Stage 1 completed correctly.
     await employeeListPage.open();
-    await employeeListPage.searchByName(firstName);
+    await employeeListPage.searchByName(fullName);
     await expect(
       employeeListPage.rowsWithName(firstName, lastName),
       `expected ${EMPLOYEES_TO_CREATE} duplicate "${firstName} ${lastName}" records`,
@@ -64,9 +69,9 @@ test.describe.serial('OrangeHRM Employee Management', () => {
   });
 
   test('TC-02: Remove duplicate Mardi employees and keep exactly one record', async () => {
-    // Re-open the list and search for the duplicate family by first name.
+    // Re-open the list and search for the duplicate family by its run-scoped full name.
     await employeeListPage.open();
-    await employeeListPage.searchByName(firstName);
+    await employeeListPage.searchByName(fullName);
 
     // Before deleting, make sure the duplicate set really exists.
     // This is an important guardrail so later failures are easier to diagnose.
@@ -81,7 +86,7 @@ test.describe.serial('OrangeHRM Employee Management', () => {
 
     // After deletion, search again and confirm that exactly one employee with the
     // required name still exists. This is the final business assertion for Stage 2.
-    await employeeListPage.searchByName(firstName);
+    await employeeListPage.searchByName(fullName);
     await expect(
       employeeListPage.rowsWithName(firstName, lastName),
       'exactly one Mardi record must remain after delete',
