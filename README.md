@@ -14,7 +14,7 @@ until exactly one remains — all through the UI.
 - **Page Object Model** for structure and reuse
 - Chromium (configurable)
 
-## Cara Menjalankan Test
+## How to Run the Test
 
 ```bash
 # 1. Install dependencies (also downloads the Chromium browser via postinstall)
@@ -35,7 +35,7 @@ npm run report
 
 Requires Node.js 18+.
 
-## Struktur Project
+## Project Structure
 
 ```
 orangehrm-sdet/
@@ -56,7 +56,7 @@ orangehrm-sdet/
 └── README.md
 ```
 
-## Strategi Locator
+## Locator Strategy
 
 Locators are **text / role / structural**, never brittle position selectors:
 
@@ -72,7 +72,7 @@ primary selection strategy, no reliance on **Employee ID**, and no hard waits
 (`sleep`) — Playwright's web-first `expect`/auto-waiting and explicit spinner
 waits handle timing.
 
-## Handling Data dengan Nama Sama
+## Handling Duplicate Names
 
 1. **Create** 5 employees with first name `Mardi` (Stage 1).
 2. **Search** the Employee List by name.
@@ -102,12 +102,12 @@ keeps one arbitrary record and removes the rest.
 
 All counts use auto-retrying `expect(locator).toHaveCount(n)` for stability.
 
-## Penggunaan AI
+## AI Usage
 
 See [AI-NOTES.md](./AI-NOTES.md) for prompts, context, what was accepted,
 improved, and rejected.
 
-## Catatan Tambahan
+## Additional Notes
 
 - **Assumption:** the search by first name returns the run's records on the
   first page of results (the demo resets its data periodically, so accumulation
