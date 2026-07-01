@@ -72,8 +72,8 @@ orangehrm-sdet/
 │       ├── AddEmployeePage.ts
 │       └── EmployeeListPage.ts # Search, checkbox selection, delete (core logic)
 ├── tests/
-│   └── employee-management.spec.ts   # 3-stage flow
-├── .github/workflows/playwright.yml  # CI: runs the suite on push/PR
+│   └── employee-management.spec.ts   # 2 serial tests: create (TC-01), delete (TC-02)
+├── .github/workflows/playwright.yml  # CI: push/PR, manual dispatch, and nightly (06:00 UTC)
 ├── playwright.config.ts
 ├── AI-NOTES.md                 # Stage 3 — AI usage notes
 └── README.md
